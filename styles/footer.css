@@ -1,0 +1,106 @@
+:root {
+  --primary-font: "Kanit", sans-serif;
+  --primary-purple: #2e00ab;
+  --light-blue: #2bc3fd;
+  --grey-texts: #666666;
+  --background-color: #f0f0f0;
+  --white-text: #ffffff;
+  --dark-color: #121231;
+  --background-color-transition: background-color 0.3s ease;
+  --color-transition: color 0.3s ease;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --nav-height: 10vh;
+  --nav-height-scrolled: 80px;
+  --hero-gradient: linear-gradient(
+    90deg,
+    rgba(46, 0, 171, 1) 35%,
+    rgba(46, 0, 171, 0.678) 100%
+  );
+}
+footer {
+  background-color: var(--primary-purple);
+}
+footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: var(--primary-font);
+}
+footer .cta-footer {
+  background-color: var(--light-blue);
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--primary-purple);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+  margin-bottom: 40px;
+}
+.content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.column {
+  flex: 1;
+  margin: 10px;
+  min-width: 200px;
+}
+.column h2 {
+  font-size: 20px;
+  color: var(--white-text);
+  margin-bottom: 15px;
+}
+.column ul li {
+  color: var(--white-text);
+}
+.column ul li a {
+  color: var(--white-text);
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  margin-bottom: 10px;
+  transition: transform 0.2s;
+}
+li:hover {
+  transform: translateX(5px);
+}
+.column .logo {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: var(--white-text);
+}
+.social-icons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.social-icons a {
+  color: var(--white-text);
+  font-size: 24px;
+  transition: color 0.3s;
+}
+.social-icons a:hover {
+  color: var(--light-blue);
+}
+.footer-company-desc {
+  color: var(--white-text);
+}
+.logo-footer {
+  width: 70%;
+  margin-top: 1rem;
+}
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+  .column {
+    width: 100%;
+  }
+}
