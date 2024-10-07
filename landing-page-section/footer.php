@@ -12,18 +12,19 @@
         <div class="column">
             <h2>About Us</h2>
             <ul>
-                <li><a href="">About Me</a></li>
-                <li><a href="">What we Do</a></li>
-                <li><a href="">Our Team</a></li>
+                <li><a href="">Home</a></li>
+                <li><a href="">Portforlio</a></li>
+                <li><a href="">Our Services</a></li>
+                <li><a href="">About Us</a></li>
 
             </ul>
         </div>
         <div class="column">
-            <h2>About Us</h2>
+            <h2>Our Solutions</h2>
             <ul>
-                <li><a href="">About Me</a></li>
-                <li><a href="">What we Do</a></li>
-                <li><a href="">Our Team</a></li>
+                <li><a href="">Nearskool</a></li>
+                <li><a href="">Klikkly</a></li>
+                <li><a href="">Realtar</a></li>
             </ul>
         </div>
         <div class="column">
