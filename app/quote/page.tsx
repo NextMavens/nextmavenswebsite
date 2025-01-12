@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { sendToTelegram } from '@/lib/telegram';
 
 interface FormData {
+
   name: string;
   email: string;
   phone: string;
@@ -54,15 +54,16 @@ const timelines = [
 
 export default function QuotePage() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
+
 
     try {
       const result = await sendToTelegram({
@@ -89,25 +90,23 @@ ${formData.message}
       } else {
         throw new Error('Failed to send message');
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Quote submission error:', error);
       setError('Failed to submit form. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#0f0428] pt-20">
       <div className="container mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto"
-        >
+        <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-white mb-6">Get a Quote</h1>
           <p className="text-white/60 mb-8">
-            Fill out the form below and we'll get back to you with a custom quote for your project.
+          Fill out the form below and we&apos;ll get back to you with a custom quote for your project.
           </p>
+
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
@@ -226,45 +225,32 @@ ${formData.message}
             </div>
 
             {error && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-red-400"
-              >
-                {error}
-              </motion.p>
+              <p className="text-red-400 animate-fade-in">
+              {error}
+              </p>
             )}
 
             {success && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-green-400"
-              >
-                Quote request sent successfully! Redirecting...
-              </motion.p>
+              <p className="text-green-400 animate-fade-in">
+              Quote request sent successfully! Redirecting...
+              </p>
             )}
 
-            <motion.button
+            <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="w-full px-8 py-4 bg-gradient-to-r from-primary-purple to-light-blue 
-                rounded-xl text-white font-medium relative overflow-hidden group disabled:opacity-50"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              rounded-xl text-white font-medium relative overflow-hidden group disabled:opacity-50
+              hover:opacity-90 transition-opacity"
             >
+
               <span className="relative z-10">
-                {loading ? 'Sending...' : 'Request Quote'}
+              {isLoading ? 'Sending...' : 'Request Quote'}
               </span>
-              <motion.div
-                className="absolute inset-0 bg-white/20"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '100%' }}
-                transition={{ duration: 0.5 }}
-              />
-            </motion.button>
-          </form>
-        </motion.div>
+            </button>
+            </form>
+          </div>
+
       </div>
     </div>
   );

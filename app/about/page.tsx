@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import AboutHero from '@/components/sections/about/AboutHero';
+
 import OurStory from '@/components/sections/about/OurStory';
 import MissionVision from '@/components/sections/about/MissionVision';
 import OurValues from '@/components/sections/about/OurValues';

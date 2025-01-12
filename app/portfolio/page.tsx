@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project, ProjectFilter } from '@/types/portfolio';
 import Image from 'next/image';
-import { FaGlobe, FaCode, FaArrowRight, FaTimes } from 'react-icons/fa';
+import { FaGlobe, FaCode, FaTimes } from 'react-icons/fa';
 
 export default function PortfolioPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filters, setFilters] = useState<ProjectFilter>({});
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -21,13 +21,9 @@ export default function PortfolioPage() {
     { id: 'mobile', name: 'Mobile Apps' }
   ];
 
-  useEffect(() => {
-    fetchProjects();
-  }, [filters]);
-
-  async function fetchProjects() {
+  const fetchProjects = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const params = new URLSearchParams(filters as Record<string, string>);
       const response = await fetch(`/api/portfolio?${params}`);
       const data = await response.json();
@@ -35,9 +31,13 @@ export default function PortfolioPage() {
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, [filters, fetchProjects]);
 
   return (
     <>
@@ -203,15 +203,15 @@ export default function PortfolioPage() {
                   {selectedProject.testimonial && (
                     <div className="bg-white/5 rounded-xl p-6">
                       <p className="text-white/80 italic mb-4">
-                        "{selectedProject.testimonial.text}"
+                      &ldquo;{selectedProject.testimonial.text}&rdquo;
                       </p>
                       <div>
-                        <p className="text-white font-medium">
-                          {selectedProject.testimonial.author}
-                        </p>
-                        <p className="text-white/60 text-sm">
-                          {selectedProject.testimonial.position}
-                        </p>
+                      <p className="text-white font-medium">
+                        {selectedProject.testimonial.author}
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        {selectedProject.testimonial.position}
+                      </p>
                       </div>
                     </div>
                   )}

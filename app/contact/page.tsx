@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import ContactHero from '@/components/sections/contact/ContactHero';
+
 import ContactForm from '@/components/sections/contact/ContactForm';
 import ContactInfo from '@/components/sections/contact/ContactInfo';
 import ContactMap from '@/components/sections/contact/ContactMap';

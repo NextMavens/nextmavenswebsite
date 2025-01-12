@@ -7,21 +7,28 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  AuthError
 } from 'firebase/auth';
 import { FaGoogle } from 'react-icons/fa';
+
+interface AuthResponse {
+  user: {
+    role: string;
+  };
+}
 
 export default function AuthForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
   const handleGoogleSignIn = async () => {
     setError('');
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const provider = new GoogleAuthProvider();
@@ -38,20 +45,20 @@ export default function AuthForm() {
         throw new Error('Failed to create session');
       }
 
-      const { user } = await response.json();
-      router.push(user.role === 'companyadmin' ? '/company' : '/dashboard');
-    } catch (error: any) {
+      const data = await response.json() as AuthResponse;
+      router.push(data.user.role === 'companyadmin' ? '/company' : '/dashboard');
+    } catch (error) {
       console.error('Google sign-in error:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       let userCredential;
@@ -59,13 +66,14 @@ export default function AuthForm() {
       if (isSignUp) {
         try {
           userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        } catch (error: any) {
-          if (error.code === 'auth/email-already-in-use') {
+        } catch (error) {
+          const authError = error as AuthError;
+          if (authError.code === 'auth/email-already-in-use') {
             setError('An account with this email already exists.');
           } else {
-            setError(error.message);
+            setError(authError.message);
           }
-          setLoading(false);
+          setIsLoading(false);
           return;
         }
       } else {
@@ -84,14 +92,14 @@ export default function AuthForm() {
         throw new Error('Authentication failed');
       }
 
-      const data = await response.json();
+      const data = await response.json() as AuthResponse;
       const role = data.user?.role || 'customer';
       router.push(role === 'companyadmin' ? '/company' : '/dashboard');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Auth error:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Authentication failed');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -132,11 +140,11 @@ export default function AuthForm() {
 
         <button
           type="submit"
-          disabled={loading}
+            disabled={isLoading}
           className="w-full py-3 bg-primary-purple rounded-lg text-white font-medium
             hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
+            {isLoading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
         </button>
 
         <div className="relative my-4">
@@ -151,7 +159,7 @@ export default function AuthForm() {
         <button
           type="button"
           onClick={handleGoogleSignIn}
-          disabled={loading}
+            disabled={isLoading}
           className="w-full py-3 bg-white/5 border border-white/10 rounded-lg text-white 
             font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed
             flex items-center justify-center gap-2"

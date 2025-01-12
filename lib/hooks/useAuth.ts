@@ -6,10 +6,28 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  User as FirebaseUser
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { UserProfile } from '@/lib/types/user';
+
+// Helper function to create a consistent user profile
+const createUserProfile = (
+  firebaseUser: FirebaseUser,
+  overrides?: Partial<Omit<UserProfile, 'id'>>
+): Omit<UserProfile, 'id'> => {
+  const now = new Date().toISOString();
+  return {
+    email: firebaseUser.email!,
+    name: firebaseUser.displayName || firebaseUser.email!.split('@')[0],
+    role: 'customer' as const,
+    createdAt: now,
+    updatedAt: now,
+    photoURL: firebaseUser.photoURL || undefined,
+    ...overrides,
+  };
+};
 
 export function useAuth() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -22,17 +40,11 @@ export function useAuth() {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           
           // If user doesn't exist in Firestore, create a new profile
-          if (!userDoc.exists()) {
-            const newUser = {
-              email: firebaseUser.email!,
-              name: firebaseUser.displayName || firebaseUser.email!.split('@')[0],
-              role: 'customer' as const,
-              createdAt: new Date().toISOString(),
-              photoURL: firebaseUser.photoURL || undefined,
-            };
-            
+            if (!userDoc.exists()) {
+            const newUser = createUserProfile(firebaseUser);
             await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
             setUser({ id: firebaseUser.uid, ...newUser });
+
           } else {
             setUser({ id: firebaseUser.uid, ...userDoc.data() } as UserProfile);
           }
@@ -61,7 +73,7 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<UserProfile> => {
     const { user: firebaseUser } = await signInWithEmailAndPassword(auth, email, password);
     const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
     
@@ -72,18 +84,14 @@ export function useAuth() {
     return { id: firebaseUser.uid, ...userDoc.data() } as UserProfile;
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string): Promise<UserProfile> => {
     const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
     
-    const userProfile: Omit<UserProfile, 'id'> = {
-      email: firebaseUser.email!,
-      name: firebaseUser.displayName || email.split('@')[0],
-      role: 'customer',
-      createdAt: new Date().toISOString(),
-    };
-
+    const userProfile = createUserProfile(firebaseUser);
     await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
+    
     return { id: firebaseUser.uid, ...userProfile };
+
   };
 
   const signOut = async () => {
