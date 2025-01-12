@@ -1,3 +1,0 @@
-font family:  Benzin
-primary-purple: #2e00ab
-light-blue: #2bc3fd

@@ -1,0 +1,100 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isCustomer() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'customer';
+    }
+    
+    function isCompanyAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'companyadmin';
+    }
+    
+    function isProjectParticipant(projectId) {
+      let project = get(/databases/$(database)/documents/applications/$(projectId)).data;
+      return request.auth.uid == project.userId || request.auth.uid == project.assignedTo;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if request.auth.uid == userId;
+      allow delete: if false; // Prevent user deletion
+    }
+
+    // Messages collection
+    match /messages/{messageId} {
+      // Only project participants can read messages
+      allow read: if isAuthenticated() && 
+        isProjectParticipant(resource.data.projectId);
+      
+      // Only project participants can create messages
+      allow create: if isAuthenticated() && 
+        isProjectParticipant(request.resource.data.projectId) &&
+        request.resource.data.senderId == request.auth.uid &&
+        (
+          (isCustomer() && request.resource.data.senderRole == 'customer') ||
+          (isCompanyAdmin() && request.resource.data.senderRole == 'companyadmin')
+        );
+      
+      // Only message sender can update readBy field
+      allow update: if isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']);
+    }
+
+    // Applications collection
+    match /applications/{applicationId} {
+      // Customers can read their own applications
+      // Company admins can read all applications
+      allow read: if isAuthenticated() && 
+        (resource.data.userId == request.auth.uid || isCompanyAdmin());
+      
+      // Only customers can create applications
+      allow create: if isAuthenticated() && 
+        isCustomer() &&
+        request.resource.data.userId == request.auth.uid;
+      
+      // Only company admins can update application status
+      allow update: if isAuthenticated() && 
+        isCompanyAdmin() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'assignedTo', 'updatedAt']);
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && 
+        (resource.data.userId == request.auth.uid || isCompanyAdmin());
+      allow create: if isCompanyAdmin();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isCompanyAdmin();
+    }
+
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isCompanyAdmin();
+    }
+
+    // Teams collection
+    match /teams/{teamId} {
+      allow read: if isAuthenticated() && 
+        (isCompanyAdmin() || resource.data.members[request.auth.uid] != null);
+      allow create, update, delete: if isCompanyAdmin();
+
+      // Team messages subcollection
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && 
+          (isCompanyAdmin() || get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null);
+        allow create: if isAuthenticated() && 
+          get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
+        allow update: if isAuthenticated() && resource.data.senderId == request.auth.uid;
+      }
+    }
+  }
+} 
