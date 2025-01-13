@@ -7,7 +7,7 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 export default function ContactMap() {
   const [ref, inView] = useInView({
     threshold: 0.3,
-    triggerOnce: true
+    triggerOnce: true,
   });
 
   return (
@@ -25,8 +25,7 @@ export default function ContactMap() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 mb-4 px-4 py-1 rounded-full 
-                bg-white/5 backdrop-blur-sm border border-white/10"
+              className="inline-flex items-center gap-2 mb-4 px-4 py-1 rounded-full bg-white/5 backdrop-blur-sm border border-white/10"
             >
               <FaMapMarkerAlt className="text-primary-purple" />
               <span className="text-sm text-white/80">Our Location</span>
@@ -35,7 +34,7 @@ export default function ContactMap() {
               Visit Our Office
             </h2>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              Come meet us in person and let's discuss your project over a cup of coffee
+              Come meet us in person and let&apos;s discuss your project over a cup of coffee.
             </p>
           </div>
 
@@ -70,8 +69,7 @@ export default function ContactMap() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 
-                rounded-xl text-white/80 hover:text-white transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white/80 hover:text-white transition-all duration-300"
             >
               <FaMapMarkerAlt />
               Get Directions
@@ -81,4 +79,4 @@ export default function ContactMap() {
       </div>
     </section>
   );
-} 
+}

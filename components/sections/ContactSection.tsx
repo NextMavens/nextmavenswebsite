@@ -2,10 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { useInView } from 'react-intersection-observer';
-import { FirebaseError } from 'firebase/app';
+import emailjs from '@emailjs/browser';
 
 interface ContactForm {
   name: string;
@@ -22,11 +20,6 @@ interface ContactForm {
 interface FormStatus {
   type: 'success' | 'error' | null;
   message: string;
-}
-
-interface FirebaseStatus {
-  isConnected: boolean;
-  lastChecked: Date | null;
 }
 
 const initialFormState: ContactForm = {
@@ -108,115 +101,56 @@ export default function ContactSection() {
   const [status, setStatus] = useState<FormStatus>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
-  const { ref, inView } = useInView({
+  const { ref } = useInView({
     threshold: 0.1,
     triggerOnce: true
   });
-  const [firebaseStatus, setFirebaseStatus] = useState<FirebaseStatus>({
-    isConnected: true,
-    lastChecked: null
-  });
-
-  const checkFirebaseConnection = async () => {
-    try {
-      // Try to write to a test collection
-      const testRef = collection(db, '_connection_test');
-      await addDoc(testRef, {
-        timestamp: serverTimestamp()
-      });
-      setFirebaseStatus({
-        isConnected: true,
-        lastChecked: new Date()
-      });
-      return true;
-    } catch (error) {
-      setFirebaseStatus({
-        isConnected: false,
-        lastChecked: new Date()
-      });
-      return false;
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus({ type: null, message: '' });
-
+  
     try {
-      // Check connection first
-      const isConnected = await checkFirebaseConnection();
-      
-      if (!isConnected) {
-        // If Firebase is blocked, use fallback method
-        const emailBody = `
-          Name: ${formData.name}
-          Email: ${formData.email}
-          Company: ${formData.company}
-          Service: ${formData.service}
-          Budget: ${formData.budget}${formData.customBudget ? ` (${formData.customBudget})` : ''}
-          Timeline: ${formData.timeline}
-          Message: ${formData.message}
-        `;
-
-        // Open default email client as fallback
-        window.location.href = `mailto:contact@nextmavens.com?subject=New Project Inquiry&body=${encodeURIComponent(emailBody)}`;
-        
+      const response = await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          company: formData.company,
+          service: formData.service,
+          message: formData.message,
+          phone: formData.phone || 'Not provided',
+          budget: formData.budget === 'Custom Amount' ? formData.customBudget : formData.budget,
+          timeline: formData.timeline || 'Not specified',
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+      );
+  
+      if (response.status === 200) {
         setStatus({
           type: 'success',
-          message: 'Opening your email client... If nothing happens, please email us directly at contact@nextmavens.com'
+          message: 'Message sent successfully! We\'ll get back to you soon.',
         });
-        return;
+        setFormData(initialFormState);
       }
-
-      // Normal Firebase submission
-      const docRef = await addDoc(collection(db, 'contacts'), {
-        ...formData,
-        timestamp: serverTimestamp(),
-        status: 'new',
-        read: false
-      });
-
-      setStatus({
-        type: 'success',
-        message: 'Message sent successfully! We\'ll get back to you soon.'
-      });
-      setFormData(initialFormState);
-    } catch (error) {
-      let errorMessage = 'Something went wrong. Please try again later.';
-      
-      if (error instanceof FirebaseError) {
-        // Handle specific Firebase errors
-        switch (error.code) {
-          case 'permission-denied':
-            errorMessage = 'Unable to send message directly. Opening email client...';
-            // Fallback to mailto
-            window.location.href = `mailto:contact@nextmavens.com`;
-            break;
-          case 'unavailable':
-            errorMessage = 'Service temporarily unavailable. Please try again later.';
-            break;
-          default:
-            errorMessage = 'Error sending message. Please try again or email us directly.';
-        }
-      }
-      
+    } catch {
       setStatus({
         type: 'error',
-        message: errorMessage
+        message: 'Failed to send message. Please try again or email us directly at contact@nextmavens.com',
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
   };
-
+  
   const handleBudgetChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'budget' && value !== 'Custom Amount') {
@@ -232,7 +166,7 @@ export default function ContactSection() {
       }));
     }
   };
-
+  
   const validateStep = (currentStep: number) => {
     switch (currentStep) {
       case 1:
@@ -245,61 +179,47 @@ export default function ContactSection() {
         return true;
     }
   };
-
+  
   const nextStep = () => {
     if (validateStep(step)) {
       setStep(prev => prev + 1);
     }
   };
-
+  
   const prevStep = () => {
     setStep(prev => prev - 1);
   };
-
-  // Get budget ranges based on selected service
+  
   const getBudgetRanges = () => {
     if (!formData.service) return [];
     return serviceBudgets[formData.service as keyof typeof serviceBudgets] || [];
   };
-
-  // Reset budget when service changes
+  
   const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       service: e.target.value,
-      budget: '', // Reset budget when service changes
-      customBudget: '' // Reset custom budget too
+      budget: '',
+      customBudget: ''
     }));
   };
-
+  
   const renderConnectionWarning = () => {
-    if (!firebaseStatus.isConnected) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 rounded-lg bg-yellow-500/10 text-yellow-400 text-sm"
-        >
-          <p>
-            It seems your browser is blocking our contact system. 
-            Don't worry! You can still contact us - your message will open in your email client.
-          </p>
-        </motion.div>
-      );
+    if (false) {
+      // Disabled warning message
+      return null;
     }
     return null;
   };
-
+  
   return (
     <section ref={ref} className="relative py-20 bg-[#0f0428] overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(46,0,171,0.03)_1.5px,transparent_1.5px),linear-gradient(to_right,rgba(46,0,171,0.03)_1.5px,transparent_1.5px)] bg-[size:30px_30px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0224] via-transparent to-[#0a0224] opacity-60" />
       </div>
-
+  
       <div className="container mx-auto px-4 relative">
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -336,11 +256,10 @@ export default function ContactSection() {
             </span>
           </h2>
           <p className="text-white/60 text-lg">
-            Ready to transform your digital presence? Let's create something amazing together.
+            Ready to transform your digital presence? Let&apos;s create something amazing together.
           </p>
         </motion.div>
-
-        {/* Enhanced Contact Form */}
+  
         <div className="max-w-2xl mx-auto">
           {renderConnectionWarning()}
           <motion.form
@@ -351,7 +270,6 @@ export default function ContactSection() {
             onSubmit={handleSubmit}
             className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
           >
-            {/* Progress Steps */}
             <div className="flex justify-between mb-8 relative">
               <div className="absolute top-1/2 h-0.5 w-full bg-white/10 -translate-y-1/2" />
               {[1, 2, 3].map((stepNumber) => (
@@ -373,8 +291,7 @@ export default function ContactSection() {
                 </motion.div>
               ))}
             </div>
-
-            {/* Step 1: Basic Info */}
+  
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div
@@ -383,9 +300,7 @@ export default function ContactSection() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  {/* Name and Email inputs */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Name Input */}
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-2">
                         Your Name
@@ -403,8 +318,7 @@ export default function ContactSection() {
                         placeholder="John Doe"
                       />
                     </div>
-
-                    {/* Email Input */}
+  
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
                         Email Address
@@ -423,8 +337,6 @@ export default function ContactSection() {
                       />
                     </div>
                   </div>
-                  
-                  {/* Phone Input */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-white/80 mb-2">
                       Phone Number (Optional)
@@ -444,7 +356,6 @@ export default function ContactSection() {
                 </motion.div>
               )}
 
-              {/* Step 2: Project Details */}
               {step === 2 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -452,9 +363,7 @@ export default function ContactSection() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  {/* Service and Company inputs */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Service Selection */}
                     <div>
                       <label htmlFor="service" className="block text-sm font-medium text-white/80 mb-2">
                         Service Interested In
@@ -478,7 +387,6 @@ export default function ContactSection() {
                       </select>
                     </div>
 
-                    {/* Company Input */}
                     <div>
                       <label htmlFor="company" className="block text-sm font-medium text-white/80 mb-2">
                         Company Name
@@ -497,7 +405,6 @@ export default function ContactSection() {
                     </div>
                   </div>
 
-                  {/* Budget Range with Custom Option */}
                   <AnimatePresence mode="wait">
                     {formData.service && (
                       <motion.div
@@ -526,7 +433,6 @@ export default function ContactSection() {
                           ))}
                         </select>
 
-                        {/* Custom Budget Input */}
                         <AnimatePresence mode="wait">
                           {formData.budget === 'Custom Amount' && (
                             <motion.div
@@ -563,7 +469,6 @@ export default function ContactSection() {
                     )}
                   </AnimatePresence>
 
-                  {/* Timeline */}
                   <div>
                     <label htmlFor="timeline" className="block text-sm font-medium text-white/80 mb-2">
                       Project Timeline
@@ -588,7 +493,6 @@ export default function ContactSection() {
                 </motion.div>
               )}
 
-              {/* Step 3: Message and Submit */}
               {step === 3 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -596,7 +500,6 @@ export default function ContactSection() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  {/* Message textarea */}
                   <div className="mb-6">
                     <label htmlFor="message" className="block text-sm font-medium text-white/80 mb-2">
                       Your Message
@@ -615,7 +518,6 @@ export default function ContactSection() {
                     />
                   </div>
 
-                  {/* Status Message */}
                   {status.type && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
@@ -628,7 +530,6 @@ export default function ContactSection() {
                     </motion.div>
                   )}
 
-                  {/* Submit Button */}
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
@@ -659,7 +560,6 @@ export default function ContactSection() {
               )}
             </AnimatePresence>
 
-            {/* Navigation Buttons */}
             <div className="flex justify-between mt-8">
               {step > 1 && (
                 <motion.button
@@ -692,4 +592,4 @@ export default function ContactSection() {
       </div>
     </section>
   );
-} 
+}

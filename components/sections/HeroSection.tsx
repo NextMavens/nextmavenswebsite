@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import CustomCursor from '../ui/CustomCursor';
-import { useRouter } from 'next/navigation';
+
 
 const services = [
   'Web Development', 'Full-Stack Solutions', 'SEO & Performance', 
@@ -72,8 +72,8 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative container mx-auto px-4">
-        <div className="pt-8 pb-20 min-h-[calc(100vh-5rem)] flex flex-col justify-center">
+      <div className="relative container mx-auto px-4 pt-16">
+        <div className="pt-8 pb-40 min-h-[calc(100vh-5rem)] flex flex-col justify-center">
           <CustomCursor />
           
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -101,7 +101,8 @@ export default function HeroSection() {
                       repeat: Infinity,
                     }}
                   />
-                  <span>Utawala, Kenya's Premier Digital Agency</span>
+                 <span>Utawala, Kenya&apos;s Premier Digital Agency</span>
+
                   <motion.span
                     initial={{ opacity: 0, scale: 0.5 }}
                     whileHover={{ opacity: 1, scale: 1 }}
@@ -152,7 +153,7 @@ export default function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed"
               >
-                East Africa's leading tech innovator, delivering cutting-edge web solutions, 
+                East Africa&apos;s leading tech innovator, delivering cutting-edge web solutions, 
                 mobile apps, and digital marketing services. From Nairobi to global markets, 
                 we transform businesses through technology.
               </motion.p>

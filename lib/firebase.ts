@@ -3,7 +3,17 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
-import { UserProfile, UserRole } from './types/user';
+
+export type UserRole = 'customer' | 'companyadmin';
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string; // Added missing field
+}
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -54,4 +64,4 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return null;
 }
 
-export { app, auth, db, googleProvider }; 
+export { app, auth, db, googleProvider };

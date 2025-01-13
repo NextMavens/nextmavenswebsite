@@ -258,10 +258,10 @@ export default function ServiceProcess() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-16"
         >
-          <p className="text-white/60 mb-6 max-w-2xl mx-auto">
-            Ready to discuss your project? Let's talk about your specific needs and create 
-            a custom solution that fits your budget.
-          </p>
+         <p className="text-white/60 mb-6 max-w-2xl mx-auto">
+  Ready to discuss your project? Let&#39;s talk about your specific needs and create 
+  a custom solution that fits your budget.
+</p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

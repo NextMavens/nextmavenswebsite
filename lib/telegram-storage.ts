@@ -52,7 +52,7 @@ export class TelegramStorage {
     }
   }
 
-  async deleteFile(fileUrl: string): Promise<boolean> {
+  async deleteFile(): Promise<boolean> {
     // Note: Telegram doesn't provide a direct way to delete files
     // This is a placeholder for future implementation
     console.warn('File deletion not implemented for Telegram storage');
@@ -78,11 +78,11 @@ export const uploadFiles = async (files: File[]): Promise<string[]> => {
   return urls;
 };
 
-export const deleteFile = async (url: string): Promise<boolean> => {
+export const deleteFile = async (): Promise<boolean> => {
   try {
-    return await telegramStorage.deleteFile(url);
+    return await telegramStorage.deleteFile();
   } catch (error) {
     console.error('Error deleting file:', error);
     throw error;
   }
-}; 
+};

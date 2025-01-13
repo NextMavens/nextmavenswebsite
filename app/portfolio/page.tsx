@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project, ProjectFilter } from '@/types/portfolio';
 import Image from 'next/image';
@@ -21,7 +21,7 @@ export default function PortfolioPage() {
     { id: 'mobile', name: 'Mobile Apps' }
   ];
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams(filters as Record<string, string>);
@@ -33,11 +33,11 @@ export default function PortfolioPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchProjects();
-  }, [filters, fetchProjects]);
+  }, [fetchProjects]);
 
   return (
     <>
@@ -62,7 +62,7 @@ export default function PortfolioPage() {
               </span>
             </h1>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              Explore our latest projects and see how we've helped businesses transform their digital presence
+              Explore our latest projects and see how we&apos;ve helped businesses transform their digital presence
             </p>
           </motion.div>
 
@@ -88,56 +88,65 @@ export default function PortfolioPage() {
             ))}
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-purple"></div>
+            </div>
+          )}
+
           {/* Portfolio Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence mode="popLayout">
-              {projects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="relative group"
-                >
-                  <div 
-                    onClick={() => setSelectedProject(project)}
-                    className="cursor-pointer"
+          {!isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <AnimatePresence mode="popLayout">
+                {projects.map((project) => (
+                  <motion.div
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="relative group"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-                      <Image
-                        src={project.imageUrls[0]}
-                        alt={project.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent 
-                        opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <div className="absolute bottom-0 p-6">
-                          <h3 className="text-xl font-semibold text-white mb-2">
-                            {project.title}
-                          </h3>
-                          <p className="text-white/60 mb-4 line-clamp-2">
-                            {project.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {project.technologies.slice(0, 3).map((tech) => (
-                              <span
-                                key={tech}
-                                className="px-3 py-1 text-sm bg-white/10 rounded-full text-white/80"
-                              >
-                                {tech}
-                              </span>
-                            ))}
+                    <div 
+                      onClick={() => setSelectedProject(project)}
+                      className="cursor-pointer"
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+                        <Image
+                          src={project.imageUrls[0]}
+                          alt={project.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent 
+                          opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <div className="absolute bottom-0 p-6">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              {project.title}
+                            </h3>
+                            <p className="text-white/60 mb-4 line-clamp-2">
+                              {project.description}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {project.technologies.slice(0, 3).map((tech) => (
+                                <span
+                                  key={tech}
+                                  className="px-3 py-1 text-sm bg-white/10 rounded-full text-white/80"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </section>
 
@@ -283,4 +292,4 @@ export default function PortfolioPage() {
       </AnimatePresence>
     </>
   );
-} 
+}

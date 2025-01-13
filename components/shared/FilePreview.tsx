@@ -1,7 +1,7 @@
 'use client';
-
+import Image from 'next/image';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaFile, FaImage, FaFilePdf, FaFileWord, FaTimes } from 'react-icons/fa';
 
 interface FileAttachment {
@@ -77,12 +77,14 @@ export default function FilePreview({ file, onClose }: Props) {
                   <div className="w-8 h-8 border-2 border-primary-purple border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
-              <img
-                src={file.url}
-                alt={file.name}
-                className="w-full h-full object-contain"
-                onLoad={() => setLoading(false)}
-              />
+             <Image
+  src={file.url}
+  alt={file.name}
+  width={500} // Specify the desired width
+  height={500} // Specify the desired height
+  className="w-full h-full object-contain"
+  onLoadingComplete={() => setLoading(false)} // Use onLoadingComplete instead of onLoad
+/>
             </>
           ) : file.type === 'application/pdf' ? (
             <iframe

@@ -5,10 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface ServiceFeature {
-  name: string;
-  description: string;
-}
+
 
 interface Service {
   id: string;

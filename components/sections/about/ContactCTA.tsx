@@ -50,7 +50,7 @@ export default function ContactCTA() {
           </h2>
           
           <p className="text-white/60 text-lg mb-12">
-            Let's discuss your project and create something amazing together
+            Let&apos;s discuss your project and create something amazing together
           </p>
 
           <motion.div
@@ -74,4 +74,4 @@ export default function ContactCTA() {
       </div>
     </section>
   );
-} 
+}

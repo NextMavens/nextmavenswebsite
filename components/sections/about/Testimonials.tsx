@@ -30,7 +30,7 @@ const testimonials: Testimonial[] = [
     position: 'Marketing Director',
     company: 'Global Solutions',
     image: '/testimonials/michael.jpg',
-    quote: 'Working with NextMavens was a game-changer for our business. Their team\'s expertise and dedication delivered outstanding results.'
+    quote: 'Working with NextMavens was a game-changer for our business. Their team&apos;s expertise and dedication delivered outstanding results.'
   },
   {
     id: 3,
@@ -103,7 +103,7 @@ export default function Testimonials() {
                     </div>
                     <div className="flex-1 text-center md:text-left">
                       <p className="text-white/80 text-lg mb-4 italic">
-                        "{testimonials[currentIndex].quote}"
+                        &quot;{testimonials[currentIndex].quote}&quot;
                       </p>
                       <h3 className="text-white font-semibold">
                         {testimonials[currentIndex].name}
@@ -143,4 +143,4 @@ export default function Testimonials() {
       </div>
     </section>
   );
-} 
+}

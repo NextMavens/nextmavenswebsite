@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaChevronDown, FaHeadset } from 'react-icons/fa';
 
 interface FAQ {
@@ -391,7 +391,7 @@ export default function ServiceFAQ() {
         >
           <div className="inline-flex items-center gap-2 mb-6 text-white/60">
             <FaHeadset className="w-5 h-5 text-light-blue" />
-            <p>Still have questions? We're here to help!</p>
+            <p>Still have questions? We&apos;re here to help!</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}

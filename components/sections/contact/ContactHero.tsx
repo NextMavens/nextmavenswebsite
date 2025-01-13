@@ -26,7 +26,7 @@ export default function ContactHero() {
             className="inline-block mb-4 px-4 py-1 rounded-full bg-white/5 backdrop-blur-sm
               border border-white/10 relative group"
           >
-            <motion.span 
+            <motion.span
               className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-purple/20 to-light-blue/20 blur-sm"
               animate={{
                 scale: [1, 1.2, 1],
@@ -42,38 +42,36 @@ export default function ContactHero() {
           </motion.div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            Let's Create Something
+            Let&apos;s Create Something
             <span className="block mt-2 bg-gradient-to-r from-primary-purple to-light-blue text-transparent bg-clip-text">
               Amazing Together
             </span>
           </h1>
           
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12">
-            Have a project in mind? We'd love to hear about it. Let's discuss how we can help bring your ideas to life.
+            Have a project in mind? We&apos;d love to hear about it. Let&apos;s discuss how we can help bring your ideas to life.
           </p>
 
           {/* Quick Contact Info */}
           <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            {[
-              {
-                icon: FaEnvelope,
-                label: 'Email Us',
-                value: 'info@nextmavens.com',
-                href: 'mailto:info@nextmavens.com'
-              },
-              {
-                icon: FaPhone,
-                label: 'Call Us',
-                value: '+254 712 345 678',
-                href: 'tel:+254712345678'
-              },
-              {
-                icon: FaMapMarkerAlt,
-                label: 'Visit Us',
-                value: 'Nairobi, Kenya',
-                href: '#location'
-              }
-            ].map((item, index) => (
+            {[{
+              icon: FaEnvelope,
+              label: 'Email Us',
+              value: 'info@nextmavens.com',
+              href: 'mailto:info@nextmavens.com'
+            },
+            {
+              icon: FaPhone,
+              label: 'Call Us',
+              value: '+254 712 345 678',
+              href: 'tel:+254712345678'
+            },
+            {
+              icon: FaMapMarkerAlt,
+              label: 'Visit Us',
+              value: 'Nairobi, Kenya',
+              href: '#location'
+            }].map((item, index) => (
               <motion.a
                 key={item.label}
                 href={item.href}
@@ -99,4 +97,4 @@ export default function ContactHero() {
       </div>
     </section>
   );
-} 
+}

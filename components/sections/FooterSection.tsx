@@ -84,10 +84,14 @@ export default function FooterSection() {
         message: 'Successfully subscribed to our newsletter!'
       });
       setEmail('');
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to subscribe. Please try again later.';
+        
       setStatus({
         type: 'error',
-        message: 'Failed to subscribe. Please try again later.'
+        message: errorMessage
       });
     } finally {
       setIsSubmitting(false);
@@ -275,4 +279,4 @@ export default function FooterSection() {
       </div>
     </footer>
   );
-} 
+}

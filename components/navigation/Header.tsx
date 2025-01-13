@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../ui/Logo';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/useAuth';
+
 import { FaTimes, FaBars, FaChevronDown } from 'react-icons/fa';
+
 
 const menuItems = [
   { 
@@ -39,7 +40,7 @@ const menuItems = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -47,6 +48,10 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   return (
     <header 
@@ -113,7 +118,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <motion.button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={toggleMobileMenu}
             className="lg:hidden p-2"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}

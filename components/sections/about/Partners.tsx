@@ -71,7 +71,7 @@ export default function Partners() {
           </h2>
           
           <p className="text-white/60 text-lg mb-12 text-center">
-            Companies we've collaborated with to create exceptional digital experiences
+            Companies we&apos;ve collaborated with to create exceptional digital experiences
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
@@ -134,4 +134,4 @@ export default function Partners() {
       </div>
     </section>
   );
-} 
+}

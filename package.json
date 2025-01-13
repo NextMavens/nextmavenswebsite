@@ -10,6 +10,7 @@
     "upload-assets": "ts-node --project scripts/tsconfig.json scripts/uploadAssets.ts"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@firebase/auth": "^1.8.1",
     "@firebase/firestore": "^4.7.5",
     "@headlessui/react": "^2.2.0",

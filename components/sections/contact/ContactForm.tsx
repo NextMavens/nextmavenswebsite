@@ -73,11 +73,15 @@ export default function ContactForm() {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error('Failed to submit');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Failed to submit form');
+      }
       
       setSubmitStatus('success');
       setFormData(initialFormData);
     } catch (error) {
+      console.error('Form submission error:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -95,7 +99,7 @@ export default function ContactForm() {
       <div className="relative z-10 p-8 bg-white/5 backdrop-blur-sm rounded-xl 
         border border-white/10 hover:bg-white/10 transition-all duration-300">
         <h2 className="text-2xl font-bold text-white mb-6">
-          Let's Start Your Project
+          Let&apos;s Start Your Project
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -273,7 +277,7 @@ export default function ContactForm() {
               }`}
             >
               {submitStatus === 'success'
-                ? 'Message sent successfully! We\'ll get back to you soon.'
+                ? 'Message sent successfully! We&apos;ll get back to you soon.'
                 : 'Failed to send message. Please try again.'}
             </motion.div>
           )}
@@ -285,4 +289,4 @@ export default function ContactForm() {
         rounded-xl blur opacity-0 group-hover:opacity-30 transition duration-300" />
     </motion.div>
   );
-} 
+}

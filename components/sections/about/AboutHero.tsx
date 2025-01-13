@@ -48,7 +48,7 @@ export default function AboutHero() {
           </h1>
           
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12">
-            We're a team of passionate developers, designers, and digital craftsmen dedicated 
+            We&apos;re a team of passionate developers, designers, and digital craftsmen dedicated 
             to creating exceptional digital experiences.
           </p>
 
@@ -80,4 +80,4 @@ export default function AboutHero() {
       </div>
     </section>
   );
-} 
+}

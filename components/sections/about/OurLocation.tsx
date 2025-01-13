@@ -67,7 +67,7 @@ export default function OurLocation() {
           </h2>
           
           <p className="text-white/60 text-lg mb-12 text-center">
-            Come meet us in person and let's discuss your project
+            Come meet us in person and let&apos;s discuss your project
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -124,4 +124,4 @@ export default function OurLocation() {
       </div>
     </section>
   );
-} 
+}

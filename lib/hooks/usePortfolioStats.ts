@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -9,7 +7,6 @@ interface PortfolioStats {
   categories: number;
   clients: number;
   isLoading: boolean;
-  error: string | null;
 }
 
 export function usePortfolioStats() {
@@ -17,8 +14,7 @@ export function usePortfolioStats() {
     totalProjects: 50,
     categories: 50,
     clients: 50,
-    isLoading: true,
-    error: null
+    isLoading: true
   });
 
   useEffect(() => {
@@ -26,21 +22,18 @@ export function usePortfolioStats() {
       try {
         const projectsRef = collection(db, 'projects');
         const projectsSnap = await getDocs(projectsRef);
-        
-        const projects = projectsSnap.docs.map(doc => doc.data());
-        
+
+        const totalProjects = projectsSnap.size;
         setStats({
-          totalProjects: 50,
-          categories: 50,
-          clients: 50,
-          isLoading: false,
-          error: null
+          totalProjects,
+          categories: 50, 
+          clients: 50,    
+          isLoading: false
         });
-      } catch (error) {
+      } catch {
         setStats(prev => ({
           ...prev,
-          isLoading: false,
-          error: 'Failed to load portfolio stats'
+          isLoading: false
         }));
       }
     }
@@ -49,4 +42,4 @@ export function usePortfolioStats() {
   }, []);
 
   return stats;
-} 
+}

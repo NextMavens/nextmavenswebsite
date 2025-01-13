@@ -68,7 +68,7 @@ export default function PortfolioSection() {
     ? projects 
     : projects.filter(project => project.category === activeFilter);
 
-  const { totalProjects, categories: categoryCount, clients, isLoading, error } = usePortfolioStats();
+  const { totalProjects, categories: categoryCount, clients, isLoading } = usePortfolioStats();
 
   const stats = [
     { 
