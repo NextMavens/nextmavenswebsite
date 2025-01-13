@@ -10,7 +10,7 @@ export default function CustomCursor() {
   useEffect(() => {
     const updateCursor = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
-      
+
       // Check if hovering over clickable element
       const target = e.target as HTMLElement;
       setIsPointer(
@@ -35,8 +35,8 @@ export default function CustomCursor() {
           initial={{ opacity: 0, scale: 0 }}
           animate={{ 
             opacity: 1, 
-            x: position.x - 8,
-            y: position.y - 8,
+            x: position.x - 6,  // Closer to the actual cursor position
+            y: position.y - 6,  // Closer to the actual cursor position
             scale: isPointer ? 1.5 : 1,
           }}
           exit={{ opacity: 0, scale: 0 }}
@@ -45,8 +45,8 @@ export default function CustomCursor() {
           transition={{
             type: "spring",
             mass: 0.3,
-            stiffness: 100,
-            damping: 10,
+            stiffness: 300,  // Increased stiffness for more responsive follow
+            damping: 12,  // Slightly reduced damping for smoother effect
           }}
         />
         
@@ -55,20 +55,20 @@ export default function CustomCursor() {
           initial={{ opacity: 0, scale: 0 }}
           animate={{ 
             opacity: 1, 
-            x: position.x - 16,
-            y: position.y - 16,
+            x: position.x - 10, // Slightly adjusted for closer tracking
+            y: position.y - 10, // Slightly adjusted for closer tracking
             scale: isPointer ? 1.5 : 1,
           }}
           exit={{ opacity: 0, scale: 0 }}
-          className="fixed w-8 h-8 rounded-full border border-light-blue/30 pointer-events-none z-50 backdrop-blur-sm"
+          className="fixed w-6 h-6 rounded-full border border-light-blue/30 pointer-events-none z-50 backdrop-blur-sm"
           transition={{
             type: "spring",
-            mass: 0.7,
-            stiffness: 50,
-            damping: 10,
+            mass: 0.5,  // Adjusted mass for smoother trailing
+            stiffness: 250, // Increased stiffness for better follow-up
+            damping: 15,  // Increased damping for a smoother trail
           }}
         />
       </>
     </AnimatePresence>
   );
-} 
+}
